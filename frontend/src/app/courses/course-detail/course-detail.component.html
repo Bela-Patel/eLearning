@@ -1,0 +1,61 @@
+<div class="container">
+  <h2>{{ course.title }}</h2>
+  <p>{{ course.description }}</p>
+  <h3>Videos</h3>
+  <ul class="list-group col-md-6">
+    <li class="list-group-item mt-3" *ngFor="let video of course.recordings">
+      <video width="400" height="200" controls autoplay>
+        <source [src]="getVideoUrl(video.filePath)" type="video/mp4">
+        Your browser does not support HTML video.
+      </video>
+      <i class="fa fa-trash fa-2x" style="cursor: pointer;" aria-hidden="true" (click)="deleteVideo(video._id)"></i>
+    </li>
+    <li class="list-group-item" *ngIf="course.recordings == 0">
+      <div class="alert alert-danger mt-3">No Video uploaded.</div>
+    </li>
+  </ul>
+
+  <button class="btn btn-secondary" (click)="toggleEdit()" *ngIf="role == 'admin'">Edit Course</button>
+
+  <div *ngIf="isEditing && role == 'admin'" class="col-md-6">
+    <h3>Edit Course</h3>
+    <form (ngSubmit)="updateCourse()" [formGroup]="courseForm">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input class="form-control" type="text" placeholder="Title" formControlName="title">
+        <div
+          *ngIf="courseForm.controls['title'].invalid && (courseForm.controls['title'].dirty || courseForm.controls['title'].touched || this.submitted)"
+          class="text-danger">
+          Title is required.
+        </div>
+      </div>
+      <div class="form-group mt-2">
+        <label for="description">Description</label>
+        <textarea class="form-control" placeholder="Description" formControlName="description"></textarea>
+        <div
+          *ngIf="courseForm.controls['description'].invalid  && (courseForm.controls['description'].dirty || courseForm.controls['description'].touched || this.submitted)"
+          class="text-danger">
+          Description is required.
+        </div>
+      </div>
+      <button type="submit" class="btn btn-success mt-2">Update Course</button>
+    </form>
+  </div>
+
+  <div *ngIf="role == 'admin'" class="col-md-6 mt-3">
+    <h3>Add New Video</h3>
+    <form (ngSubmit)="addVideo()" [formGroup]="videoForm">
+      <div class="mb-3 form-group">
+        <label for="videoUrl" class="form-label">Video URL</label>
+        <input type="file" id="video" class="form-control" (change)="onFileChange($event)">
+        <div
+          *ngIf="((course.recordings &&course.recordings.length==0) && (videoForm.get('video').hasError('required') && this.submitted))"
+          class="text-danger">
+          Video is required.
+        </div>
+      </div>
+      <button type="submit" class="btn btn-success">Add Video</button>
+      <button class="btn btn-secondary ms-2" type="button" (click)="allCourses()">Back</button>
+    </form>
+  </div>
+</div>
